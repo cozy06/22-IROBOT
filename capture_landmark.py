@@ -1,5 +1,7 @@
 import cv2
 import mediapipe as mp
+import time
+import playsound
 
 def face_video(num):
     img_count = 0
@@ -55,6 +57,8 @@ def face_video(num):
             # 보기 편하게 이미지를 좌우 반전합니다.
             cv2.imshow('MediaPipe Face Mesh(Puleugo)', cv2.flip(image, 1))
             if cv2.waitKey(5)== ord('q'):
+                playsound('sound/camera.mp3')
+                time.sleep(1)
                 img_count += 1
                 ret, frame = cap.read()
                 frame = cv2.flip(frame, 1)
@@ -119,4 +123,4 @@ count = 10
 face_video(count)
 for i in range(1, count+1):
     globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
-print(globals()['landmarks-1'])
+print(globals()['landmarks-1'].landmark[0])
