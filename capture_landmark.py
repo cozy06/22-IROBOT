@@ -1,7 +1,7 @@
 import cv2
 import mediapipe as mp
 import time
-import playsound
+from playsound import playsound
 
 def face_video(num):
     img_count = 0
@@ -58,7 +58,6 @@ def face_video(num):
             cv2.imshow('MediaPipe Face Mesh(Puleugo)', cv2.flip(image, 1))
             if cv2.waitKey(5)== ord('q'):
                 playsound('sound/camera.mp3')
-                time.sleep(1)
                 img_count += 1
                 ret, frame = cap.read()
                 frame = cv2.flip(frame, 1)
