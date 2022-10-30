@@ -7,7 +7,7 @@ def face_video(num):
     mp_drawing_styles = mp.solutions.drawing_styles
     mp_face_mesh = mp.solutions.face_mesh
 
-    drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
+    # drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
     cap = cv2.VideoCapture(0)
     with mp_face_mesh.FaceMesh(
             max_num_faces=1,
@@ -115,7 +115,8 @@ def face_img(img, i):
     return face_landmarks
 
 
-face_video(10)
-for i in range(1, 11) :
-    print(i)
-    face_img(f"capture/test-{i}.jpg", i)
+count = 10
+face_video(count)
+for i in range(1, count+1):
+    globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
+print(globals()['landmarks-1'])
