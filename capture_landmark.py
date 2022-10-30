@@ -118,4 +118,4 @@ def face_img(img, i):
 face_video(10)
 for i in range(1, 11) :
     print(i)
-    face_img(f"test.jpg-{i}", i)
+    face_img(f"capture/test-{i}.jpg", i)
