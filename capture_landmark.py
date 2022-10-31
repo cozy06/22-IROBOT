@@ -1,7 +1,43 @@
 import cv2
 import mediapipe as mp
-import time
 from playsound import playsound
+
+def face_detect_video(num):
+    img_count = 0
+    mp_face_detection = mp.solutions.face_detection
+    mp_drawing = mp.solutions.drawing_utils
+    cap = cv2.VideoCapture(0)
+    with mp_face_detection.FaceDetection(
+            model_selection=0, min_detection_confidence=0.5) as face_detection:
+        while cap.isOpened():
+            success, image = cap.read()
+            if not success:
+                print("웹캠을 찾을 수 없습니다.")
+                # 비디오 파일의 경우 'continue'를 사용하시고, 웹캠에 경우에는 'break'를 사용하세요.
+                continue
+            # 보기 편하기 위해 이미지를 좌우를 반전하고, BGR 이미지를 RGB로 변환합니다.
+            image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
+            # 성능을 향상시키려면 이미지를 작성 여부를 False으로 설정하세요.
+            image.flags.writeable = False
+            results = face_detection.process(image)
+
+            # 영상에 얼굴 감지 주석 그리기 기본값 : True.
+            image.flags.writeable = True
+            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+            if results.detections:
+                for detection in results.detections:
+                    mp_drawing.draw_detection(image, detection)
+            cv2.imshow('MediaPipe Face Detection', image)
+            if cv2.waitKey(5) == ord('q'):
+                playsound('sound/camera.mp3')
+                img_count += 1
+                ret, frame = cap.read()
+                frame = cv2.flip(frame, 1)
+                cv2.imwrite(f'capture/test-{img_count}.jpg', frame)  # 사진 저장
+                if img_count == num:
+                    break
+    cap.release()
+    cv2.destroyAllWindows()
 
 def face_video(num):
     img_count = 0
@@ -9,7 +45,6 @@ def face_video(num):
     mp_drawing_styles = mp.solutions.drawing_styles
     mp_face_mesh = mp.solutions.face_mesh
 
-    # drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
     cap = cv2.VideoCapture(0)
     with mp_face_mesh.FaceMesh(
             max_num_faces=1,
@@ -63,17 +98,14 @@ def face_video(num):
                 frame = cv2.flip(frame, 1)
                 cv2.imwrite(f'capture/test-{img_count}.jpg', frame)  # 사진 저장
                 if img_count == num :
-                    cap.release()
-                    cv2.destroyAllWindows()
                     break
     cap.release()
+    cv2.destroyAllWindows()
 
 
 # 이미지 읽기
 def face_img(img, i):
-    # mp_drawing = mp.solutions.drawing_utils
     mp_drawing_styles = mp.solutions.drawing_styles
-    # mp_face_mesh = mp.solutions.face_mesh
 
     # 얼굴 검출을 위한 객체
     mp_face_mesh = mp.solutions.face_mesh
@@ -84,7 +116,6 @@ def face_img(img, i):
     )
     # Face Mesh를 그리기 위한 객체
     mp_drawing = mp.solutions.drawing_utils
-    # drawing_spec = mp_drawing.DrawingSpec(thickness=1, circle_radius=1)
 
     annotated_image = cv2.imread(img)
 
@@ -119,7 +150,8 @@ def face_img(img, i):
 
 
 count = 10
-face_video(count)
+#face_video(count) #리소스 up
+face_detect_video(count) #리소스 down
 for i in range(1, count+1):
     globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
 print(globals()['landmarks-1'].landmark[0])
