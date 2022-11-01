@@ -3,6 +3,20 @@ import mediapipe as mp
 from playsound import playsound
 
 
+def fix_xyz(mark):
+    standard = mark.landmark[164]
+    chin = mark.landmark[18]
+    ratio_x = 1 / chin.x
+    ratio_y = 1 / chin.y
+    ratio_z = 1 / chin.z
+    for i in range(0, 468):
+        mark.landmark[i].x = (mark.landmark[i].x - standard.x) * ratio_x
+        mark.landmark[i].y = (mark.landmark[i].y - standard.y) * ratio_y
+        mark.landmark[i].z = (mark.landmark[i].z - standard.z) * ratio_z
+    print(mark.landmark[18])
+    return mark
+
+
 def face_detect_video(num):
     img_count = 0
     mp_face_detection = mp.solutions.face_detection
@@ -157,3 +171,5 @@ count = 10
 for i in range(1, count + 1):
     globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
 print(globals()['landmarks-1'].landmark[0])
+print(globals()['landmarks-1'].landmark[1])
+fix_xyz(globals()['landmarks-1'])
