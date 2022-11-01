@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 from playsound import playsound
 
+
 def face_detect_video(num):
     img_count = 0
     mp_face_detection = mp.solutions.face_detection
@@ -38,6 +39,7 @@ def face_detect_video(num):
                     break
     cap.release()
     cv2.destroyAllWindows()
+
 
 def face_video(num):
     img_count = 0
@@ -91,13 +93,13 @@ def face_video(num):
                         .get_default_face_mesh_iris_connections_style())
             # 보기 편하게 이미지를 좌우 반전합니다.
             cv2.imshow('MediaPipe Face Mesh(Puleugo)', cv2.flip(image, 1))
-            if cv2.waitKey(5)== ord('q'):
+            if cv2.waitKey(5) == ord('q'):
                 playsound('sound/camera.mp3')
                 img_count += 1
                 ret, frame = cap.read()
                 frame = cv2.flip(frame, 1)
                 cv2.imwrite(f'capture/test-{img_count}.jpg', frame)  # 사진 저장
-                if img_count == num :
+                if img_count == num:
                     break
     cap.release()
     cv2.destroyAllWindows()
@@ -112,7 +114,7 @@ def face_img(img, i):
     face_mesh = mp_face_mesh.FaceMesh(
         refine_landmarks=True,
         static_image_mode=True,
-        max_num_faces=3,
+        max_num_faces=1,
     )
     # Face Mesh를 그리기 위한 객체
     mp_drawing = mp.solutions.drawing_utils
@@ -150,8 +152,8 @@ def face_img(img, i):
 
 
 count = 10
-#face_video(count) #리소스 up
-face_detect_video(count) #리소스 down
-for i in range(1, count+1):
+# face_video(count) #리소스 up
+# face_detect_video(count) #리소스 down
+for i in range(1, count + 1):
     globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
 print(globals()['landmarks-1'].landmark[0])
