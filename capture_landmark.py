@@ -13,7 +13,6 @@ def fix_xyz(mark):
         mark.landmark[i].x = (mark.landmark[i].x - standard.x) * ratio_x
         mark.landmark[i].y = (mark.landmark[i].y - standard.y) * ratio_y
         mark.landmark[i].z = (mark.landmark[i].z - standard.z) * ratio_z
-    print(mark.landmark[18])
     return mark
 
 
@@ -138,7 +137,6 @@ def face_img(img, i):
     # 얼굴 검출
     results = face_mesh.process(annotated_image)
     for face_landmarks in results.multi_face_landmarks:
-        # print('face_landmarks:', face_landmarks)
         mp_drawing.draw_landmarks(
             image=annotated_image,
             landmark_list=face_landmarks,
@@ -165,11 +163,79 @@ def face_img(img, i):
     return face_landmarks
 
 
-count = 10
+def distance(landmark):
+    num = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
+    num[0][0] = landmark[164].x #인중
+    num[0][1] = landmark[164].y
+    num[0][2] = landmark[164].z
+    num[1][0] = landmark[4].x #코
+    num[1][1] = landmark[4].y
+    num[1][2] = landmark[4].z
+    num[2][0] = landmark[129].x
+    num[2][1] = landmark[129].y
+    num[2][2] = landmark[129].z
+    num[3][0] = landmark[358].x
+    num[3][1] = landmark[358].y
+    num[3][2] = landmark[358].z
+    num[4][0] = landmark[168].x #인중
+    num[4][1] = landmark[168].y
+    num[4][2] = landmark[168].z
+    num[5][0] = landmark[33].x #눈
+    num[5][1] = landmark[33].y
+    num[5][2] = landmark[33].z
+    num[6][0] = landmark[133].x
+    num[6][1] = landmark[133].y
+    num[6][2] = landmark[133].z
+    num[7][0] = landmark[263].x
+    num[7][1] = landmark[263].y
+    num[7][2] = landmark[263].z
+    num[8][0] = landmark[362].x
+    num[8][1] = landmark[362].y
+    num[8][2] = landmark[362].z
+    num[9][0] = landmark[70].x # 눈썹
+    num[9][1] = landmark[70].y
+    num[9][2] = landmark[70].z
+    num[10][0] = landmark[107].x
+    num[10][1] = landmark[107].y
+    num[10][2] = landmark[107].z
+    num[11][0] = landmark[300].x
+    num[11][1] = landmark[300].y
+    num[11][2] = landmark[300].z
+    num[12][0] = landmark[336].x
+    num[12][1] = landmark[336].y
+    num[12][2] = landmark[336].z
+    num[13][0] = landmark[61].x #입
+    num[13][1] = landmark[61].y
+    num[13][2] = landmark[61].z
+    num[14][0] = landmark[291].x
+    num[14][1] = landmark[291].y
+    num[14][2] = landmark[291].z
+    num[15][0] = landmark[18].x
+    num[15][1] = landmark[18].y
+    num[15][2] = landmark[18].z
+    num[16][0] = landmark[175].x #턱
+    num[16][1] = landmark[175].y
+    num[16][2] = landmark[175].z
+    num[17][0] = landmark[367].x
+    num[17][1] = landmark[367].y
+    num[17][2] = landmark[367].z
+    num[18][0] = landmark[135].x
+    num[18][1] = landmark[135].y
+    num[18][2] = landmark[135].z
+    dis = list(range(0,171))
+    j = 0
+    for i in range(0,18):
+        for a in range(i+1,19):
+            dis[j] = ((abs(num[i][0]-num[a][0])**2) + (abs(num[i][1]-num[a][1])**2) + (abs(num[i][2]-num[a][2])**2))*1000000
+            j += 1
+    return dis
+
+
+count = 1
 # face_video(count) #리소스 up
-# face_detect_video(count) #리소스 down
+face_detect_video(count) #리소스 down
 for i in range(1, count + 1):
     globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
-print(globals()['landmarks-1'].landmark[0])
-print(globals()['landmarks-1'].landmark[1])
-fix_xyz(globals()['landmarks-1'])
+
+Dis = distance(fix_xyz(globals()['landmarks-1']).landmark)
+print(Dis)
