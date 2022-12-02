@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 from playsound import playsound
+import pandas as pd
 
 
 def fix_xyz(mark):
@@ -230,12 +231,35 @@ def distance(landmark):
             j += 1
     return dis
 
+choose = int(input("학습/분류: "))
+print(choose)
+if choose is 1:
+    name = int(input("학번: "))
+    count = 5
+    # face_video(count) #리소스 up
+    face_detect_video(count)  # 리소스 down
+    for i in range(1, count + 1):
+        globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
 
-count = 1
-# face_video(count) #리소스 up
-face_detect_video(count) #리소스 down
-for i in range(1, count + 1):
-    globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
-
-Dis = distance(fix_xyz(globals()['landmarks-1']).landmark)
-print(Dis)
+    Dis1 = distance(fix_xyz(globals()['landmarks-1']).landmark)
+    Dis2 = distance(fix_xyz(globals()['landmarks-2']).landmark)
+    Dis3 = distance(fix_xyz(globals()['landmarks-3']).landmark)
+    Dis4 = distance(fix_xyz(globals()['landmarks-4']).landmark)
+    Dis5 = distance(fix_xyz(globals()['landmarks-5']).landmark)
+    Dis1.append(f"{name}_1")
+    Dis2.append(f"{name}_2")
+    Dis3.append(f"{name}_3")
+    Dis4.append(f"{name}_4")
+    Dis5.append(f"{name}_5")
+    df = pd.DataFrame({'0': Dis1, \
+                        '1': Dis2, \
+                        '2': Dis3, \
+                        '3': Dis4, \
+                        '4': Dis5})
+    df = df.transpose()
+    print(df)
+    df.to_csv('TF/TrainData.csv')
+elif choose is 2:
+    print("sdssdsdsd")
+else:
+    print("sdsd")
