@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 from playsound import playsound
 import pandas as pd
+from csv import writer
 
 
 def fix_xyz(mark):
@@ -165,11 +166,12 @@ def face_img(img, i):
 
 
 def distance(landmark):
-    num = [[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0],[0,0,0]]
-    num[0][0] = landmark[164].x #인중
+    num = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+           [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
+    num[0][0] = landmark[164].x  # 인중
     num[0][1] = landmark[164].y
     num[0][2] = landmark[164].z
-    num[1][0] = landmark[4].x #코
+    num[1][0] = landmark[4].x  # 코
     num[1][1] = landmark[4].y
     num[1][2] = landmark[4].z
     num[2][0] = landmark[129].x
@@ -178,10 +180,10 @@ def distance(landmark):
     num[3][0] = landmark[358].x
     num[3][1] = landmark[358].y
     num[3][2] = landmark[358].z
-    num[4][0] = landmark[168].x #인중
+    num[4][0] = landmark[168].x  # 인중
     num[4][1] = landmark[168].y
     num[4][2] = landmark[168].z
-    num[5][0] = landmark[33].x #눈
+    num[5][0] = landmark[33].x  # 눈
     num[5][1] = landmark[33].y
     num[5][2] = landmark[33].z
     num[6][0] = landmark[133].x
@@ -193,7 +195,7 @@ def distance(landmark):
     num[8][0] = landmark[362].x
     num[8][1] = landmark[362].y
     num[8][2] = landmark[362].z
-    num[9][0] = landmark[70].x # 눈썹
+    num[9][0] = landmark[70].x  # 눈썹
     num[9][1] = landmark[70].y
     num[9][2] = landmark[70].z
     num[10][0] = landmark[107].x
@@ -205,7 +207,7 @@ def distance(landmark):
     num[12][0] = landmark[336].x
     num[12][1] = landmark[336].y
     num[12][2] = landmark[336].z
-    num[13][0] = landmark[61].x #입
+    num[13][0] = landmark[61].x  # 입
     num[13][1] = landmark[61].y
     num[13][2] = landmark[61].z
     num[14][0] = landmark[291].x
@@ -214,7 +216,7 @@ def distance(landmark):
     num[15][0] = landmark[18].x
     num[15][1] = landmark[18].y
     num[15][2] = landmark[18].z
-    num[16][0] = landmark[175].x #턱
+    num[16][0] = landmark[175].x  # 턱
     num[16][1] = landmark[175].y
     num[16][2] = landmark[175].z
     num[17][0] = landmark[367].x
@@ -223,43 +225,67 @@ def distance(landmark):
     num[18][0] = landmark[135].x
     num[18][1] = landmark[135].y
     num[18][2] = landmark[135].z
-    dis = list(range(0,171))
+    dis = list(range(0, 171))
     j = 0
-    for i in range(0,18):
-        for a in range(i+1,19):
-            dis[j] = ((abs(num[i][0]-num[a][0])**2) + (abs(num[i][1]-num[a][1])**2) + (abs(num[i][2]-num[a][2])**2))*1000000
+    for i in range(0, 18):
+        for a in range(i + 1, 19):
+            dis[j] = ((abs(num[i][0] - num[a][0]) ** 2) + (abs(num[i][1] - num[a][1]) ** 2) + (
+                        abs(num[i][2] - num[a][2]) ** 2)) * 1000000
             j += 1
     return dis
 
-choose = int(input("학습/분류: "))
-print(choose)
-if choose is 1:
+def making_points(count):
+    try:
+        # face_video(count) #리소스 up
+        face_detect_video(count)  # 리소스 down
+        for i in range(1, count + 1):
+            globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
+    except:
+        making_points(count)
+
+choose = int(input("학습(0)/분류(1): "))
+if choose is 0:
     name = int(input("학번: "))
-    count = 5
-    # face_video(count) #리소스 up
-    face_detect_video(count)  # 리소스 down
-    for i in range(1, count + 1):
-        globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
+    making_points(count=10)
 
     Dis1 = distance(fix_xyz(globals()['landmarks-1']).landmark)
     Dis2 = distance(fix_xyz(globals()['landmarks-2']).landmark)
     Dis3 = distance(fix_xyz(globals()['landmarks-3']).landmark)
     Dis4 = distance(fix_xyz(globals()['landmarks-4']).landmark)
     Dis5 = distance(fix_xyz(globals()['landmarks-5']).landmark)
-    Dis1.append(f"{name}_1")
-    Dis2.append(f"{name}_2")
-    Dis3.append(f"{name}_3")
-    Dis4.append(f"{name}_4")
-    Dis5.append(f"{name}_5")
-    df = pd.DataFrame({'0': Dis1, \
-                        '1': Dis2, \
-                        '2': Dis3, \
-                        '3': Dis4, \
-                        '4': Dis5})
-    df = df.transpose()
-    print(df)
-    df.to_csv('TF/TrainData.csv')
-elif choose is 2:
+    Dis6 = distance(fix_xyz(globals()['landmarks-6']).landmark)
+    Dis7 = distance(fix_xyz(globals()['landmarks-7']).landmark)
+    Dis8 = distance(fix_xyz(globals()['landmarks-8']).landmark)
+    Dis9 = distance(fix_xyz(globals()['landmarks-9']).landmark)
+    Dis10 = distance(fix_xyz(globals()['landmarks-10']).landmark)
+    Dis1.append(name)
+    Dis2.append(name)
+    Dis3.append(name)
+    Dis4.append(name)
+    Dis5.append(name)
+    Dis6.append(name)
+    Dis7.append(name)
+    Dis8.append(name)
+    Dis9.append(name)
+    Dis10.append(name)
+    with open('TF/TrainData.csv', 'a', newline='') as f_object:
+        writer_object = writer(f_object)
+        writer_object.writerow(Dis1)
+        writer_object.writerow(Dis2)
+        writer_object.writerow(Dis3)
+        writer_object.writerow(Dis4)
+        writer_object.writerow(Dis5)
+        writer_object.writerow(Dis6)
+        writer_object.writerow(Dis7)
+        f_object.close()
+    with open('TF/VerificationData.csv', 'a', newline='') as f_object:
+        writer_object = writer(f_object)
+        writer_object.writerow(Dis8)
+        writer_object.writerow(Dis9)
+        writer_object.writerow(Dis10)
+        f_object.close()
+
+elif choose is 1:
     print("sdssdsdsd")
 else:
     print("sdsd")
