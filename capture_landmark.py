@@ -1,7 +1,8 @@
+import time
+
 import cv2
 import mediapipe as mp
 from playsound import playsound
-import pandas as pd
 from csv import writer
 
 
@@ -44,15 +45,18 @@ def face_detect_video(num):
                 for detection in results.detections:
                     mp_drawing.draw_detection(image, detection)
             cv2.imshow('MediaPipe Face Detection', image)
-            if cv2.waitKey(5) == ord('q'):
-                playsound('sound/camera.mp3')
-                img_count += 1
-                ret, frame = cap.read()
-                frame = cv2.flip(frame, 1)
-                cv2.imwrite(f'capture/test-{img_count}.jpg', frame)  # 사진 저장
-                if img_count == num:
-                    break
+            if cv2.waitKey(1) == ord('q'):
+                while True:
+                    time.sleep(0.0001)
+                    img_count += 1
+                    ret, frame = cap.read()
+                    frame = cv2.flip(frame, 1)
+                    cv2.imwrite(f'capture/test-{img_count}.jpg', frame)  # 사진 저장
+                    if img_count == num:
+                        break
+                break
     cap.release()
+    playsound('sound/camera.mp3')
     cv2.destroyAllWindows()
 
 
@@ -109,14 +113,17 @@ def face_video(num):
             # 보기 편하게 이미지를 좌우 반전합니다.
             cv2.imshow('MediaPipe Face Mesh(Puleugo)', cv2.flip(image, 1))
             if cv2.waitKey(5) == ord('q'):
-                playsound('sound/camera.mp3')
-                img_count += 1
-                ret, frame = cap.read()
-                frame = cv2.flip(frame, 1)
-                cv2.imwrite(f'capture/test-{img_count}.jpg', frame)  # 사진 저장
-                if img_count == num:
-                    break
+                while True:
+                    time.sleep(0.0001)
+                    img_count += 1
+                    ret, frame = cap.read()
+                    frame = cv2.flip(frame, 1)
+                    cv2.imwrite(f'capture/test-{img_count}.jpg', frame)  # 사진 저장
+                    if img_count == num:
+                        break
+                break
     cap.release()
+    playsound('sound/camera.mp3')
     cv2.destroyAllWindows()
 
 
@@ -230,7 +237,7 @@ def distance(landmark):
     for i in range(0, 18):
         for a in range(i + 1, 19):
             dis[j] = ((abs(num[i][0] - num[a][0]) ** 2) + (abs(num[i][1] - num[a][1]) ** 2) + (
-                        abs(num[i][2] - num[a][2]) ** 2)) * 1000000
+                        abs(num[i][2] - num[a][2]) ** 2)) * 0.1
             j += 1
     return dis
 
@@ -246,43 +253,22 @@ def making_points(count):
 choose = int(input("학습(0)/분류(1): "))
 if choose is 0:
     name = int(input("학번: "))
-    making_points(count=10)
+    counts = 100
+    making_points(count=counts)
 
-    Dis1 = distance(fix_xyz(globals()['landmarks-1']).landmark)
-    Dis2 = distance(fix_xyz(globals()['landmarks-2']).landmark)
-    Dis3 = distance(fix_xyz(globals()['landmarks-3']).landmark)
-    Dis4 = distance(fix_xyz(globals()['landmarks-4']).landmark)
-    Dis5 = distance(fix_xyz(globals()['landmarks-5']).landmark)
-    Dis6 = distance(fix_xyz(globals()['landmarks-6']).landmark)
-    Dis7 = distance(fix_xyz(globals()['landmarks-7']).landmark)
-    Dis8 = distance(fix_xyz(globals()['landmarks-8']).landmark)
-    Dis9 = distance(fix_xyz(globals()['landmarks-9']).landmark)
-    Dis10 = distance(fix_xyz(globals()['landmarks-10']).landmark)
-    Dis1.append(name)
-    Dis2.append(name)
-    Dis3.append(name)
-    Dis4.append(name)
-    Dis5.append(name)
-    Dis6.append(name)
-    Dis7.append(name)
-    Dis8.append(name)
-    Dis9.append(name)
-    Dis10.append(name)
+    Dis_list = []
+    for i in range(0, counts):
+        Dis_list.append(distance(fix_xyz(globals()[f'landmarks-{i + 1}']).landmark))
+        Dis_list[i].append(name)
     with open('TF/TrainData.csv', 'a', newline='') as f_object:
         writer_object = writer(f_object)
-        writer_object.writerow(Dis1)
-        writer_object.writerow(Dis2)
-        writer_object.writerow(Dis3)
-        writer_object.writerow(Dis4)
-        writer_object.writerow(Dis5)
-        writer_object.writerow(Dis6)
-        writer_object.writerow(Dis7)
+        for i in range(0, counts*90//100):
+            writer_object.writerow(Dis_list[i])
         f_object.close()
     with open('TF/VerificationData.csv', 'a', newline='') as f_object:
         writer_object = writer(f_object)
-        writer_object.writerow(Dis8)
-        writer_object.writerow(Dis9)
-        writer_object.writerow(Dis10)
+        for i in range(counts*90//100, counts):
+            writer_object.writerow(Dis_list[i])
         f_object.close()
 
 elif choose is 1:
