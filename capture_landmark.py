@@ -284,4 +284,4 @@ elif choose is 1:
             writer_object.writerow(Dis_list[i])
         f_object.close()
 else:
-    print("sdsd")
+    print("0과 ")
