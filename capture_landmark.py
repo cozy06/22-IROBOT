@@ -8,14 +8,10 @@ from csv import writer
 
 def fix_xyz(mark):
     standard = mark.landmark[164]
-    chin = mark.landmark[18]
-    ratio_x = 1 / chin.x
-    ratio_y = 1 / chin.y
-    ratio_z = 1 / chin.z
     for i in range(0, 468):
-        mark.landmark[i].x = (mark.landmark[i].x - standard.x) * ratio_x
-        mark.landmark[i].y = (mark.landmark[i].y - standard.y) * ratio_y
-        mark.landmark[i].z = (mark.landmark[i].z - standard.z) * ratio_z
+        mark.landmark[i].x = (mark.landmark[i].x - standard.x)
+        mark.landmark[i].y = (mark.landmark[i].y - standard.y)
+        mark.landmark[i].z = (mark.landmark[i].z - standard.z)
     return mark
 
 
@@ -37,6 +33,9 @@ def face_detect_video(num):
             # 성능을 향상시키려면 이미지를 작성 여부를 False으로 설정하세요.
             image.flags.writeable = False
             results = face_detection.process(image)
+
+            cv2.line(image, (735, 800), (1215, 800), (0, 255, 0), 10)
+            # cv2.rectangle(image, (575, 675, 775, 625), (0, 255, 0), 10)
 
             # 영상에 얼굴 감지 주석 그리기 기본값 : True.
             image.flags.writeable = True
@@ -250,38 +249,22 @@ def making_points(count):
     except:
         making_points(count)
 
-choose = int(input("학습(0)/분류(1): "))
-if choose is 0:
-    name = int(input("학번: "))
-    counts = 100
-    making_points(count=counts)
 
-    Dis_list = []
-    for i in range(0, counts):
-        Dis_list.append(distance(fix_xyz(globals()[f'landmarks-{i + 1}']).landmark))
-        Dis_list[i].append(name)
-    with open('TF/TrainData.csv', 'a', newline='') as f_object:
-        writer_object = writer(f_object)
-        for i in range(0, counts*90//100):
-            writer_object.writerow(Dis_list[i])
-        f_object.close()
-    with open('TF/VerificationData.csv', 'a', newline='') as f_object:
-        writer_object = writer(f_object)
-        for i in range(counts*90//100, counts):
-            writer_object.writerow(Dis_list[i])
-        f_object.close()
+name = int(input("학번: "))
+counts = 200
+making_points(count=counts)
 
-elif choose is 1:
-    counts = 1
-    making_points(count=counts)
-
-    Dis_list = []
-    for i in range(0, counts):
-        Dis_list.append(distance(fix_xyz(globals()[f'landmarks-{i + 1}']).landmark))
-    with open('TF/ClassificationData.csv', 'a', newline='') as f_object:
-        writer_object = writer(f_object)
-        for i in range(0, counts):
-            writer_object.writerow(Dis_list[i])
-        f_object.close()
-else:
-    print("0과 ")
+Dis_list = []
+for i in range(0, counts):
+    Dis_list.append(distance(fix_xyz(globals()[f'landmarks-{i + 1}']).landmark))
+    Dis_list[i].append(name)
+with open('TF/TrainData.csv', 'a', newline='') as f_object:
+    writer_object = writer(f_object)
+    for i in range(0, counts * 90 // 100):
+        writer_object.writerow(Dis_list[i])
+    f_object.close()
+with open('TF/VerificationData.csv', 'a', newline='') as f_object:
+    writer_object = writer(f_object)
+    for i in range(counts * 90 // 100, counts):
+        writer_object.writerow(Dis_list[i])
+    f_object.close()
