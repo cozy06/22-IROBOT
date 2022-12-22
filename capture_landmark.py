@@ -272,6 +272,16 @@ if choose is 0:
         f_object.close()
 
 elif choose is 1:
-    print("sdssdsdsd")
+    counts = 1
+    making_points(count=counts)
+
+    Dis_list = []
+    for i in range(0, counts):
+        Dis_list.append(distance(fix_xyz(globals()[f'landmarks-{i + 1}']).landmark))
+    with open('TF/ClassificationData.csv', 'a', newline='') as f_object:
+        writer_object = writer(f_object)
+        for i in range(0, counts):
+            writer_object.writerow(Dis_list[i])
+        f_object.close()
 else:
     print("sdsd")
