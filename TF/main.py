@@ -1,3 +1,4 @@
+import os
 import time
 
 import cv2
@@ -8,14 +9,10 @@ from csv import writer
 
 def fix_xyz(mark):
     standard = mark.landmark[164]
-    chin = mark.landmark[18]
-    ratio_x = 1 / chin.x
-    ratio_y = 1 / chin.y
-    ratio_z = 1 / chin.z
     for i in range(0, 468):
-        mark.landmark[i].x = (mark.landmark[i].x - standard.x) * ratio_x
-        mark.landmark[i].y = (mark.landmark[i].y - standard.y) * ratio_y
-        mark.landmark[i].z = (mark.landmark[i].z - standard.z) * ratio_z
+        mark.landmark[i].x = (mark.landmark[i].x - standard.x)
+        mark.landmark[i].y = (mark.landmark[i].y - standard.y)
+        mark.landmark[i].z = (mark.landmark[i].z - standard.z)
     return mark
 
 
@@ -38,6 +35,8 @@ def face_detect_video(num):
             image.flags.writeable = False
             results = face_detection.process(image)
 
+            cv2.line(image, (735, 800), (1215, 800), (0, 255, 0), 10)
+
             # 영상에 얼굴 감지 주석 그리기 기본값 : True.
             image.flags.writeable = True
             image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
@@ -51,12 +50,13 @@ def face_detect_video(num):
                     img_count += 1
                     ret, frame = cap.read()
                     frame = cv2.flip(frame, 1)
-                    cv2.imwrite(f'capture/test-{img_count}.jpg', frame)  # 사진 저장
+                    cv2.imwrite(f'{os.path.dirname(os.path.abspath(__file__))[0:-3]}/capture/test-{img_count}.jpg',
+                                frame)  # 사진 저장
                     if img_count == num:
                         break
                 break
     cap.release()
-    playsound('sound/camera.mp3')
+    playsound(f'{os.path.dirname(os.path.abspath(__file__))[0:-3]}/sound/camera.mp3')
     cv2.destroyAllWindows()
 
 
@@ -168,7 +168,7 @@ def face_img(img, i):
             connection_drawing_spec=mp_drawing_styles
             .get_default_face_mesh_iris_connections_style())
 
-    cv2.imwrite(f"result/face-mesh-{i}.jpg", annotated_image)
+    cv2.imwrite(f"{os.path.dirname(os.path.abspath(__file__))[0:-3]}/result/face-mesh-{i}.jpg", annotated_image)
     return face_landmarks
 
 
@@ -237,27 +237,31 @@ def distance(landmark):
     for i in range(0, 18):
         for a in range(i + 1, 19):
             dis[j] = ((abs(num[i][0] - num[a][0]) ** 2) + (abs(num[i][1] - num[a][1]) ** 2) + (
-                        abs(num[i][2] - num[a][2]) ** 2)) * 0.1
+                    abs(num[i][2] - num[a][2]) ** 2)) * 0.1
             j += 1
     return dis
+
 
 def making_points(count):
     try:
         # face_video(count) #리소스 up
         face_detect_video(count)  # 리소스 down
         for i in range(1, count + 1):
-            globals()["landmarks-{}".format(i)] = face_img(f"capture/test-{i}.jpg", i)
+            globals()["landmarks-{}".format(i)] = face_img(
+                f"{os.path.dirname(os.path.abspath(__file__))[0:-3]}/capture/test-{i}.jpg", i)
     except:
         making_points(count)
 
 
-counts = 1
+name = 30  # 사람 최대 번호
+counts = 100
 making_points(count=counts)
 
 Dis_list = []
 for i in range(0, counts):
     Dis_list.append(distance(fix_xyz(globals()[f'landmarks-{i + 1}']).landmark))
-with open('TF/ClassificationData.csv', 'a', newline='') as f_object:
+    Dis_list[i].append(name)
+with open('ClassificationData.csv', 'a', newline='') as f_object:
     writer_object = writer(f_object)
     for i in range(0, counts):
         writer_object.writerow(Dis_list[i])
