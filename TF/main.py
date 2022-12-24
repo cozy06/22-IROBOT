@@ -253,7 +253,7 @@ def making_points(count):
         making_points(count)
 
 
-name = 30  # 사람 최대 번호
+name = 1  # 사람 최대 번호
 counts = 100
 making_points(count=counts)
 
