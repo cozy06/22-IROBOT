@@ -20,7 +20,7 @@ def face_detect_video(num):
     img_count = 0
     mp_face_detection = mp.solutions.face_detection
     mp_drawing = mp.solutions.drawing_utils
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     with mp_face_detection.FaceDetection(
             model_selection=0, min_detection_confidence=0.5) as face_detection:
         while cap.isOpened():
